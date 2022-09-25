@@ -4,7 +4,7 @@
 // https://contest.yandex.ru/contest/39360/problems
 // 70157701 70157298 70156630
 // WA 0/10
-// по идее задача сделала
+// по идее задача сделана
 function renderWaterfall(rootNode, columnCount, elementGap) {
   document.body.style.margin = "0px";
   document.body.style.padding = "0px";

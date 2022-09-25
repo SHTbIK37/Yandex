@@ -1,8 +1,6 @@
 // https://contest.yandex.ru/contest/39361/problems/
 // 69976071
-// task 4 promise
 // 26.25 /30
-// не останавливается код после нахождения элемента done
 export default function main(game, start) {
   let x = start.x;
   let y = start.y;
