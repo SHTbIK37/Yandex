@@ -9,8 +9,8 @@ function solution(n, width, height) {
     let photoArray = [];
     const elemString = columnCounter; // колво элементво в строке
     const stringCounter = Math.ceil(n / elemString); // колво строк
-    const photoWidth = Math.round(width / columnCounter); // ширина фотки ретурнить
-    const photoHeight = Math.round(photoWidth / ratio); // высота фотки ретурнить
+    const photoWidth = Math.round(width / columnCounter); // ширина фотки
+    const photoHeight = Math.round(photoWidth / ratio); // высота фотки
     const generalHeight = photoHeight * stringCounter; // общая высота фоток
     const differenceVertical = height - generalHeight;
     const differenceHorizontal = width - firstStringElem * photoWidth;
@@ -83,8 +83,8 @@ function solution(n, width, height) {
     let photoArray = [];
     const elemString = columnCounter; // колво элементво в строке
     const stringCounter = Math.ceil(n / elemString); // колво строк
-    const photoWidth = Math.round(width / columnCounter); // ширина фотки ретурнить
-    const photoHeight = Math.round(photoWidth / ratio); // высота фотки ретурнить
+    const photoWidth = Math.round(width / columnCounter); // ширина фотки
+    const photoHeight = Math.round(photoWidth / ratio); // высота фотки
     const generalHeight = photoHeight * stringCounter; // общая высота фоток
     const differenceVertical = height - generalHeight;
     let photoCenter = Math.round(photoWidth / 2);
