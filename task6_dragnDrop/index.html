@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Почта с тегами</title>
+    <meta charset="utf-8" />
+    <style>
+      .Page {
+        font-family: Arial;
+        font-size: 12px;
+        margin: 0;
+        padding: 0;
+        color: #2f2d33;
+      }
+      .Logo {
+        font-size: 24px;
+        padding: 12px;
+        margin: 0;
+      }
+      .Main {
+        display: flex;
+      }
+      .Tags {
+        width: 25%;
+        background-color: #fffae5;
+        padding: 6px;
+      }
+      .Tags_dropzone {
+        background-color: #ffedba;
+      }
+      .Tags_dragovered {
+        background-color: #ffd98e;
+      }
+      .Tags_dragovered * {
+        pointer-events: none;
+      }
+      .Tag {
+        background-color: #ffc062;
+        color: #592400;
+        margin: 6px;
+        padding: 6px;
+        display: inline-block;
+      }
+      .Tag_dragged {
+        background-color: #ff9100;
+      }
+      .Tag_removed {
+        display: none;
+      }
+      .Letters {
+        width: 100%;
+        background-color: #91cfff;
+      }
+      .Letters_dropzone {
+        background-color: #4da0ff;
+      }
+      .Letter {
+        display: flex;
+        color: #00244d;
+      }
+      .Letter_dragovered {
+        background-color: #006fed;
+      }
+      .Letter_dragovered * {
+        pointer-events: none;
+      }
+      .Letter__Title {
+        margin: 12px;
+      }
+    </style>
+  </head>
+
+  <body class="Page">
+    <script>
+      let data = window.data || {
+        tags: {
+          1: "важное",
+          2: "личное",
+          3: "рабочее",
+          4: "Проект X",
+          5: "Проект Y",
+        },
+        letters: [
+          {
+            id: "1",
+            title: "Приглашение на день рождения",
+            tags: ["1", "2"],
+          },
+          {
+            id: "2",
+            title: "Ответ на ваш комментарий",
+            tags: ["2"],
+          },
+          {
+            id: "3",
+            title: "Резюме последней встречи про X",
+            tags: ["3", "4"],
+          },
+          {
+            id: "4",
+            title: "Расчётный лист",
+            tags: ["1", "3"],
+          },
+          {
+            id: "5",
+            title: "Нужна помощь с Y",
+            tags: ["3", "5"],
+          },
+          {
+            id: "6",
+            title: "Регулярная рассылка для клиентов",
+            tags: [],
+          },
+        ],
+      };
+
+      function mapAndJoin(a, f, s = "") {
+        return a.map(f).join(s);
+      }
+      function buildHtml(data) {
+        return `
+        <div class="Main">
+          <div class="Tags">
+            ${mapAndJoin(Object.entries(data.tags), ([id, title]) =>
+              buildTagHtml(id, title)
+            )}
+          </div>
+          <div class="Letters">
+            ${mapAndJoin(
+              data.letters,
+              ({ id, title, tags }) => `
+                <div class="Letter" data-letter-id="${id}">
+                  <div class="Letter__Title">${title}</div>
+                  ${mapAndJoin(tags, (l) => buildTagHtml(l, data.tags[l]))}
+                </div>
+              `
+            )}
+          </div>
+        </div>
+      `;
+      }
+      function buildTagHtml(id, title) {
+        return `<div class="Tag" data-tag-id="${id}">${title}</div>`;
+      }
+      document.body.innerHTML = buildHtml(data);
+      window.onSolutionReady && window.onSolutionReady();
+      // __________________________
+      // https://contest.yandex.ru/contest/39365/submits/
+      // <!-- 70209359 -->
+      // ok 30/30
+      const tagsZone = document.getElementsByClassName("Tags")[0];
+      const dropZone = document.getElementsByClassName("Letters")[0];
+      const tagslist = document.getElementsByClassName("Tag");
+      const lettersList = document.getElementsByClassName("Letter");
+      let tagslistArray = Array.from(tagslist);
+      let time;
+      let timeClone;
+      tagslistArray.forEach((element) => {
+        element.draggable = true;
+      });
+      function dragstart(event) {
+        const element = event.target;
+        dropZone.classList.add(`Letters_dropzone`);
+        element.classList.add(`Tag_dragged`);
+        time = element;
+        timeClone = element.cloneNode(true);
+        timeClone.addEventListener("dragstart", dragstart);
+        timeClone.classList.add(`Tag_dragged`);
+        if (element.parentNode.classList.contains("Letter")) {
+          tagsZone.classList.add(`Tags_dropzone`);
+        }
+      }
+      function dragend(event) {
+        const element = event.target;
+        dropZone.classList.remove(`Letters_dropzone`);
+        element.classList.remove(`Tag_dragged`);
+        timeClone.addEventListener("dragend", dragend);
+        timeClone.classList.remove(`Tag_dragged`);
+        tagsZone.classList.remove(`Tags_dropzone`);
+      }
+      function drop(event) {
+        if (!time.parentNode.classList.contains("Tags")) time.remove();
+        event.target.classList.remove(`Tags_dragovered`);
+      }
+      for (let i = 0; i < tagslist.length; i++) {
+        const tag = tagslist[i];
+        // ______________________________________________________________________________________________________
+        tag.addEventListener("dragstart", dragstart); //++++
+        // ______________________________________________________________________________________________________
+        tag.addEventListener("dragend", dragend); //++++
+      }
+      // ______________________________________________________________________________________________________
+      for (let i = 0; i < lettersList.length; i++) {
+        const letter = lettersList[i];
+        letter.addEventListener("dragover", (l) => {
+          l.preventDefault();
+        });
+        // ______________________________________________________________________________________________________
+        letter.addEventListener("dragenter", () => {
+          const letterChildren = letter.children;
+          let flag = 0;
+
+          for (let i = 1; i < letterChildren.length; i++) {
+            if (
+              letterChildren[i].getAttribute("data-tag-id") ==
+              time.getAttribute("data-tag-id")
+            ) {
+              flag = 1;
+              break;
+            }
+          }
+          if (flag == 0) letter.classList.add(`Letter_dragovered`);
+        });
+        // ______________________________________________________________________________________________________
+        letter.addEventListener("dragleave", () => {
+          letter.classList.remove(`Letter_dragovered`);
+        });
+        // ______________________________________________________________________________________________________
+        letter.addEventListener("drop", () => {
+          const letterChildren = letter.children;
+          let flag = 0;
+          for (let i = 1; i < letterChildren.length; i++) {
+            if (
+              letterChildren[i].getAttribute("data-tag-id") ==
+              time.getAttribute("data-tag-id")
+            ) {
+              flag = 1;
+              break;
+            }
+          }
+          if (flag == 0) {
+            if (time.parentNode.classList.contains("Letter")) {
+              letter.appendChild(time);
+            } else {
+              letter.appendChild(timeClone);
+            }
+          }
+
+          time.classList.remove(`Tag_dragged`);
+          letter.classList.remove(`Letter_dragovered`);
+        });
+      }
+      // ______________________________________________________________________________________________________
+      tagsZone.addEventListener("dragenter", () => {
+        if (time.parentNode.classList.contains("Letter")) {
+          tagsZone.classList.add(`Tags_dragovered`);
+        }
+      });
+      // ______________________________________________________________________________________________________
+      tagsZone.addEventListener("dragleave", () => {
+        tagsZone.classList.remove(`Tags_dragovered`);
+      });
+      tagsZone.addEventListener("dragover", (event) => {
+        event.preventDefault();
+      });
+      tagsZone.addEventListener("drop", drop);
+    </script>
+  </body>
+</html>
